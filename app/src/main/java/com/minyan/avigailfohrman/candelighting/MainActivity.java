@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     String latitudeName = "lat";
     String longitudeName = "lng";
     String defaultDate = "date=today";
-    StringBuilder urlResponse = new StringBuilder();
     TextView candleLightingTimeTextView;
 
     @Override
@@ -97,20 +96,6 @@ public class MainActivity extends AppCompatActivity {
         sunsetApiUrlStringBuilder.append(defaultDate);
     }
 
-    private void createHttpsUrlConnection() {
-        try {
-            sunsetUrl = new URL(sunsetApiUrlStringBuilder.toString());
-            HttpsURLConnection urlConnection = (HttpsURLConnection) sunsetUrl.openConnection();
-            InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-
-            readStream(inputStream);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void handleJsonRequest() {
         String sampleUrl = "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400&date=today";
         sunsetApiUrlStringBuilder = new StringBuilder(sampleUrl);
@@ -118,9 +103,10 @@ public class MainActivity extends AppCompatActivity {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, sunsetApiUrlStringBuilder.toString(), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                String time = "6:47";
+                StringBuilder time = new StringBuilder();
                 try {
-                    time = response.getString("sunset");
+                    JSONObject jsonObject = response.getJSONObject("results");
+                    time.append(jsonObject.getString("sunset"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
